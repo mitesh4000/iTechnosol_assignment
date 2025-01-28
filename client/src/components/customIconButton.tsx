@@ -16,6 +16,7 @@ const CustomIconButton: React.FC<CustomIconButtonProps> = ({
       whileTap={{ scale: 0.9 }}
       className="group-hover:opacity-100 transition-opacity duration-200 m-1"
       onClick={onClick}
+      type="button"
       style={{ border: "none", background: "transparent", cursor: "pointer" }}
     >
       {children}

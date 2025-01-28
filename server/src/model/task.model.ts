@@ -29,7 +29,7 @@ const taskSchema = new mongoose.Schema(
       required: true,
     },
     userId: {
-      type: String,
+      type: mongoose.Types.ObjectId,
       ref: "users",
     },
     isDeleted: {

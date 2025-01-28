@@ -1,5 +1,7 @@
 import axios from "axios";
 import { useFormik } from "formik";
+import { Save, XCircle } from "lucide-react";
+import { motion } from "motion/react";
 import { FormInput } from "../interface/task.interface";
 import CustomInput from "./customInput";
 import CustomTextArea from "./customTextArea";
@@ -48,9 +50,17 @@ const AddTaskForm = ({
   });
 
   return (
-    <div className={isOpen ? "block" : "hidden"}>
-      <form onSubmit={formik.handleSubmit} className="p-6">
-        <div className="space-y-2 flex flex-row justify-between">
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      className={isOpen ? "block" : "hidden"}
+    >
+      <form
+        onSubmit={formik.handleSubmit}
+        className="p-6 bg-lime-50 rounded-b-md"
+      >
+        <div className="space-y-2 flex flex-row justify-between ">
           <CustomInput
             id="title"
             name="title"
@@ -85,13 +95,26 @@ const AddTaskForm = ({
         </div>
         <div className="space-y-2"></div>
         <div className="flex justify-end space-x-2 pt-4">
-          <button onClick={onClose} type="button">
-            canecll
+          <button
+            onClick={onClose}
+            type="button"
+            className="flex items-cente hover:bg-red-100 text-red-500 font-bold py-2 px-4 rounded transition duration-200 ease-in-out "
+            aria-label="Cancel"
+          >
+            <XCircle size={20} className="mr-1 " />
+            <span>Cancel</span>
           </button>
-          <button type="submit">save</button>
+          <button
+            type="submit"
+            className="flex items-cente hover:bg-green-100 text-green-500 font-bold py-2 px-4 rounded transition duration-200 ease-in-out "
+            aria-label="Save"
+          >
+            <Save size={20} className="mr-1" />
+            <span>Save</span>
+          </button>
         </div>
       </form>
-    </div>
+    </motion.div>
   );
 };
 

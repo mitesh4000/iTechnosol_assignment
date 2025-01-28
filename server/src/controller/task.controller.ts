@@ -1,14 +1,16 @@
 import { Request, Response } from "express";
+import { ObjectId } from "mongodb";
 import { z } from "zod";
 import Task from "../model/task.model";
 import { authRequest } from "../types/authRequest";
 import { errorResponse, successResponse } from "../utils/responseFormatter";
 import { taskIputValidation } from "../utils/validationSchemas";
 
-export const createTask = async (req: Request, res: Response) => {
+export const createTask = async (req: authRequest, res: Response) => {
   try {
     const validatedData = taskIputValidation.parse(req.body);
     const newTask = new Task(validatedData);
+    newTask.userId = new ObjectId(req.userId);
     await newTask.save();
     return res.status(201).json(newTask);
   } catch (error) {
@@ -74,7 +76,9 @@ export const updateTask = async (req: Request, res: Response) => {
         .json(errorResponse("Invalid request", "taskId not provided"));
     }
     const validatedData = taskIputValidation.parse(req.body);
-    const updatedTask = await Task.findByIdAndUpdate(taskId, validatedData);
+    const updatedTask = await Task.findByIdAndUpdate(taskId, validatedData, {
+      new: true,
+    });
     if (!updatedTask) {
       return res
         .status(404)
