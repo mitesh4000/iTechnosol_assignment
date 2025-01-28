@@ -30,7 +30,7 @@ const CustomInput: React.FC<CustomInputProps> = ({
         </label>
       )}
       <input
-        className="relative w-full bg-white border border-gray-300 rounded-md  pl-3 pr-10 py-2 text-left cursor-default focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+        className="relative w-full bg-gray-100   border-gray-300 rounded-md  pl-3 pr-10 py-2 text-left cursor-default focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
         id={id}
         name={name}
         type={type}

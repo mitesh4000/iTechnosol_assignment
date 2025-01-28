@@ -1,5 +1,6 @@
 import axios from "axios";
 import { useFormik } from "formik";
+import { FormInput } from "../interface/task.interface";
 import CustomInput from "./customInput";
 import CustomTextArea from "./customTextArea";
 
@@ -10,12 +11,6 @@ const AddTaskForm = ({
   isOpen: boolean | undefined;
   onClose: () => void;
 }) => {
-  interface FormInput {
-    title: string;
-    description: string;
-    deadline: string;
-  }
-
   const handleSubmit = async (values: FormInput) => {
     try {
       const token =
