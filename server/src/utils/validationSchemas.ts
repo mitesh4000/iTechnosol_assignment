@@ -12,6 +12,7 @@ export const taskIputValidation = z.object({
     .refine((date) => new Date(date) > new Date(), {
       message: "Deadline must be in the future",
     }),
+  status: z.enum(["pending", "in progress", "completed"]).optional(),
 });
 
 export const projectSchema = z

@@ -62,7 +62,7 @@ const AddTaskForm = ({
     >
       <form
         onSubmit={formik.handleSubmit}
-        className="p-6 bg-lime-50 rounded-b-md"
+        className="p-6 bg-white border border-gray-200 rounded"
       >
         <div className="space-y-2 flex flex-row justify-between ">
           <CustomInput
@@ -94,7 +94,7 @@ const AddTaskForm = ({
             value={formik.values.description}
             onChange={formik.handleChange}
             onBlur={formik.handleBlur}
-            rows={3}
+            rows={2}
           ></CustomTextArea>
         </div>
         <div className="space-y-2"></div>
@@ -102,7 +102,7 @@ const AddTaskForm = ({
           <button
             onClick={onClose}
             type="button"
-            className="flex items-cente hover:bg-red-100 text-red-500 font-bold py-2 px-4 rounded transition duration-200 ease-in-out "
+            className="flex items-cente hover:bg-red-100 text-red-500 font-bold py-2 px-2 rounded transition duration-200 ease-in-out "
             aria-label="Cancel"
           >
             <XCircle size={20} className="mr-1 " />
@@ -110,7 +110,7 @@ const AddTaskForm = ({
           </button>
           <button
             type="submit"
-            className="flex items-cente hover:bg-green-100 text-green-500 font-bold py-2 px-4 rounded transition duration-200 ease-in-out "
+            className="flex items-cente hover:bg-green-100 text-green-400 font-bold py-2 px-4 rounded transition duration-200 ease-in-out "
             aria-label="Save"
           >
             <Save size={20} className="mr-1" />

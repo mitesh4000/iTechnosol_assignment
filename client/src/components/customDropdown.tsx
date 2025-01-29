@@ -47,7 +47,7 @@ const CustomDropdown: React.FC<CustomDropdownProps> = ({
       <div className="relative">
         <button
           type="button"
-          className="relative w-full bg-gray-100  rounded-md  pl-3 pr-10 py-2 my-1 text-left cursor-default focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+          className="relative w-full bg-gray-100 border border-gray-50 rounded-md  pl-3 pr-10 py-2 my-1 text-left cursor-default focus:outline-none focus:ring-1 focus:ring-lime-500 focus:border-lime-500 sm:text-sm"
           onClick={toggleDropdown}
           aria-haspopup="listbox"
           aria-expanded={isOpen}
@@ -70,7 +70,7 @@ const CustomDropdown: React.FC<CustomDropdownProps> = ({
 
         {isOpen && (
           <ul
-            className="absolute z-10 mt-1 w-full bg-white shadow-lg max-h-60 rounded-md py-1 text-base  overflow-auto focus:outline-none sm:text-sm"
+            className="absolute z-10 mt-1 w-full  bg-white shadow-lg max-h-60 rounded-md py-1 text-base  overflow-auto focus:outline-none sm:text-sm"
             tabIndex={-1}
             role="listbox"
             aria-labelledby={id}
@@ -80,8 +80,8 @@ const CustomDropdown: React.FC<CustomDropdownProps> = ({
                 key={index}
                 className={`cursor-default select-none relative py-2 pl-3 pr-9 hover:bg-blue-100 ${
                   value === option
-                    ? "text-blue-900 font-medium"
-                    : "text-gray-900"
+                    ? "text-lime-900 font-medium"
+                    : "text-lime-900"
                 }`}
                 onClick={() => handleSelect(option)}
                 role="option"
@@ -95,7 +95,7 @@ const CustomDropdown: React.FC<CustomDropdownProps> = ({
                   {option}
                 </span>
                 {value === option && (
-                  <span className="absolute inset-y-0 right-0 flex items-center pr-4 text-blue-600">
+                  <span className="absolute inset-y-0 right-0 flex items-center pr-4 text-lime-600">
                     <svg
                       className="h-5 w-5"
                       viewBox="0 0 20 20"

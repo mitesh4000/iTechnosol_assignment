@@ -39,6 +39,8 @@ const CustomInput: React.FC<CustomInputProps> = ({
   ${error ? "bg-red-50" : "bg-gray-100"} 
   ${error ? "border-red-400" : "border-gray-300"} 
   rounded-md 
+  border
+  border-gray-50
   pl-3 pr-10 py-2 
   text-left cursor-default 
   focus:outline-none 

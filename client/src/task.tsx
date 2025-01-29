@@ -17,6 +17,7 @@ import CustomIconButton from "./components/customIconButton";
 import CustomInput from "./components/customInput";
 import CustomTextArea from "./components/customTextArea";
 import Navbar from "./components/navbar";
+import StatusBadge from "./components/status";
 import { FormInput, Task } from "./interface/task.interface";
 
 export default function TaskListing() {
@@ -33,11 +34,12 @@ export default function TaskListing() {
       title: "",
       description: "",
       deadline: "",
-      status: "pending",
+      status: "",
       _id: "",
     },
     onSubmit: (values) => {
       console.log(values);
+      values.deadline = values.deadline.split("T")[0];
       handleSubmit(values);
     },
   });
@@ -68,7 +70,7 @@ export default function TaskListing() {
       const token = localStorage.getItem("token")?.split(" ")[1];
 
       const response = await axios.put(
-        `${import.meta.env.VITE_API_URL}/api/task/${values._id}`,
+        `${import.meta.env.VITE_BASE_URL}/api/task/${values._id}`,
         values,
         {
           headers: {
@@ -77,6 +79,7 @@ export default function TaskListing() {
           },
         }
       );
+      await fetchAndBindData();
 
       console.log(response.data);
     } catch (error) {
@@ -187,163 +190,24 @@ export default function TaskListing() {
                 <AddTaskForm
                   isOpen={taskOps?.addTaskFormOpen}
                   onClose={() => {
+                    fetchAndBindData();
                     setTaskOps({ ...taskOps, addTaskFormOpen: false });
                   }}
                 ></AddTaskForm>
               </motion.div>
               <ul className="space-y-2">
-                {tasks?.map((task, index) => (
-                  <li
-                    className="flex items-center flex-col p-2 hover:bg-lime-50 rounded transition-colors"
-                    key={index}
-                  >
-                    {taskOps?.deleteIndex !== index ? (
-                      <form
-                        onSubmit={formik.handleSubmit}
-                        className="flex items-center flex-col justify-between w-full"
-                      >
-                        <div className="flex items-center justify-between w-full">
-                          {taskOps?.updateIndex === index ? (
-                            <motion.div
-                              initial={{ opacity: 0, y: -10 }}
-                              animate={{ opacity: 1, y: 0 }}
-                              exit={{ opacity: 0, y: 10 }}
-                              className="flex-grow"
-                            >
-                              <CustomInput
-                                id="title"
-                                name="title"
-                                value={formik.values.title}
-                                onChange={formik.handleChange}
-                                onBlur={formik.handleBlur}
-                                type="text"
-                                className="w-full mr-3"
-                              ></CustomInput>
-                            </motion.div>
-                          ) : (
-                            <motion.span
-                              initial={{ opacity: 0, y: 10 }}
-                              animate={{ opacity: 1, y: 0 }}
-                              exit={{ opacity: 0, y: -10 }}
-                              className="flex-grow text-gray-800 font-medium"
-                            >
-                              {task.title}
-                            </motion.span>
-                          )}
-
-                          <div className="flex items-center">
-                            {
-                              taskOps?.viewIndex === index ? (
-                                taskOps?.updateIndex !== index ? (
-                                  <motion.div>
-                                    <CustomIconButton
-                                      onClick={() => {
-                                        setTaskOps((prev) => ({
-                                          ...prev,
-                                          updateIndex: index,
-                                          viewIndex: index,
-                                        }));
-                                        formik.setValues({
-                                          title: task.title,
-                                          description: task.description,
-                                          deadline: task.deadline,
-                                          status: task.status,
-                                          _id: task._id,
-                                        });
-                                      }}
-                                    >
-                                      <Pencil className="w-5 h-5 text-blue-400" />
-                                    </CustomIconButton>
-                                    <CustomIconButton
-                                      onClick={() => {
-                                        setTaskOps((prev) => ({
-                                          ...prev,
-                                          viewIndex: -1,
-                                          deleteIndex: index,
-                                        }));
-                                      }}
-                                    >
-                                      <Trash
-                                        size={20}
-                                        className="w-5 h-5 text-red-400"
-                                      />
-                                    </CustomIconButton>
-                                  </motion.div>
-                                ) : (
-                                  <motion.div>
-                                    <CustomIconButton
-                                      onClick={() => {
-                                        setTaskOps((prev) => ({
-                                          ...prev,
-                                          updateIndex: -1,
-                                        }));
-                                      }}
-                                    >
-                                      <CheckCircle className="w-5 h-5 text-blue-400" />
-                                    </CustomIconButton>
-                                    <CustomIconButton
-                                      onClick={() => {
-                                        setTaskOps((prev) => ({
-                                          ...prev,
-                                          updateIndex: -1,
-                                          viewIndex: -1,
-                                        }));
-                                      }}
-                                    >
-                                      <XCircle
-                                        className="w-5 h-5 text-red-400"
-                                        size={20}
-                                      />
-                                    </CustomIconButton>
-                                  </motion.div>
-                                )
-                              ) : null // Return null if viewIndex does not match
-                            }
-
-                            <motion.div
-                              animate={{
-                                rotate: taskOps?.viewIndex === index ? 180 : 0,
-                              }}
-                              transition={{ duration: 0.3 }}
-                            >
-                              <CustomIconButton
-                                onClick={() =>
-                                  taskOps?.viewIndex === index
-                                    ? setTaskOps((prev) => ({
-                                        ...prev,
-                                        viewIndex: -1,
-                                        deleteIndex: -1,
-                                        addTaskFormOpen: false,
-                                      }))
-                                    : setTaskOps((prev) => ({
-                                        ...prev,
-                                        viewIndex: index,
-                                        deleteIndex: -1,
-                                        addTaskFormOpen: false,
-                                      }))
-                                }
-                              >
-                                <ChevronDown
-                                  className="w-5 h-5 text-blue-400"
-                                  size={20}
-                                />
-                              </CustomIconButton>
-                            </motion.div>
-                          </div>
-                        </div>
-
-                        {taskOps?.viewIndex === index && (
-                          <motion.div
-                            initial={{ y: 20, opacity: 0 }}
-                            animate={{ y: 0, opacity: 1 }}
-                            exit={{ y: 20, opacity: 0 }}
-                            transition={{
-                              duration: 0.3,
-                              ease: "easeOut",
-                              delay: 0.1,
-                            }}
-                            className="w-full border-t flex justify-between border-gray-200 rounded-md  py-2 my-2 "
-                          >
+                {tasks.length > 0 ? (
+                  tasks?.map((task, index) => (
+                    <li
+                      className="flex items-center flex-col p-2 hover:bg-lime-50 rounded transition-colors"
+                      key={index}
+                    >
+                      {taskOps?.deleteIndex !== index ? (
+                        <form
+                          onSubmit={formik.handleSubmit}
+                          className="flex items-center flex-col justify-between w-full"
+                        >
+                          <div className="flex items-center justify-between w-full">
                             {taskOps?.updateIndex === index ? (
                               <motion.div
                                 initial={{ opacity: 0, y: -10 }}
@@ -351,96 +215,253 @@ export default function TaskListing() {
                                 exit={{ opacity: 0, y: 10 }}
                                 className="flex-grow"
                               >
-                                <div className="flex flex-row">
-                                  <CustomTextArea
-                                    name="description"
-                                    id="description"
-                                    value={formik.values.description}
-                                    onChange={formik.handleChange}
-                                    onBlur={formik.handleBlur}
-                                    className="w-full mr-2"
-                                    rows={3}
-                                  ></CustomTextArea>
-                                  <div className="flex flex-col">
-                                    <CustomInput
-                                      id="deadline"
-                                      name="deadline"
-                                      type="date"
-                                      value={formik.values.deadline}
-                                      onChange={formik.handleChange}
-                                      onBlur={formik.handleBlur}
-                                    ></CustomInput>
-                                    <div className="flex space-x-4">
-                                      <CustomDropdown
-                                        id="status"
-                                        name="status"
-                                        options={statusOptions}
-                                        value={task.status}
-                                        onChange={formik.handleChange}
-                                      ></CustomDropdown>
-                                    </div>
-                                  </div>
-                                </div>
+                                <CustomInput
+                                  id="title"
+                                  name="title"
+                                  value={formik.values.title}
+                                  onChange={formik.handleChange}
+                                  onBlur={formik.handleBlur}
+                                  type="text"
+                                  className="w-full mr-3"
+                                ></CustomInput>
                               </motion.div>
                             ) : (
                               <motion.span
                                 initial={{ opacity: 0, y: 10 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 exit={{ opacity: 0, y: -10 }}
-                                className="flex-grow text-gray-800 font-medium flex justify-between"
+                                className="flex-grow flex-col text-gray-800 font-medium"
                               >
-                                <p className="text-gray-700 text-sm leading-relaxed">
-                                  {task.description}
-                                </p>
-                                <p className="text-gray-700 text-sm leading-relaxed bg-gray-200 rounded-md p-1">
-                                  {task.deadline.split("T")[0]}
-                                </p>
+                                <span className="mr-2">{index + 1}.</span>
+                                <span className="flex-grow text-gray-800 font-medium truncate mr-2">
+                                  {task.title}
+                                </span>
+                                <StatusBadge status={task.status}></StatusBadge>
                               </motion.span>
                             )}
-                          </motion.div>
-                        )}
-                      </form>
-                    ) : (
-                      <motion.div
-                        initial={{ opacity: 0, y: -10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: 10 }}
-                        className="flex items-center justify-between w-full border-2 border-red-300 bg-red-50 rounded-sm p-2"
-                      >
-                        <span className="text-[#424242]">
-                          are you sure you want to delete this task ?
-                        </span>
-                        <div className="flex items-center">
-                          <CustomIconButton
-                            onClick={() => {
-                              handleDelete(task._id);
-                            }}
-                          >
-                            <CheckCircle
-                              size={20}
-                              className="text-green-400 hover:text-green-600 transition-colors m-1"
-                            />
-                          </CustomIconButton>
 
-                          <CustomIconButton
-                            onClick={() => {
-                              setTaskOps((prev) => ({
-                                ...prev,
-                                viewIndex: -1,
-                                deleteIndex: -1,
-                              }));
-                            }}
-                          >
-                            <XCircle
-                              size={20}
-                              className="text-red-400 hover:text-red-600 transition-colors m-1"
-                            />
-                          </CustomIconButton>
-                        </div>
-                      </motion.div>
-                    )}
-                  </li>
-                ))}
+                            <div className="flex items-center">
+                              {
+                                taskOps?.viewIndex === index ? (
+                                  taskOps?.updateIndex !== index ? (
+                                    <motion.div>
+                                      <CustomIconButton
+                                        onClick={() => {
+                                          setTaskOps((prev) => ({
+                                            ...prev,
+                                            updateIndex: index,
+                                            viewIndex: index,
+                                          }));
+                                          formik.setValues({
+                                            title: task.title,
+                                            description: task.description,
+                                            deadline: task.deadline,
+                                            status: task.status,
+                                            _id: task._id,
+                                          });
+                                        }}
+                                      >
+                                        <Pencil className="w-5 h-5 text-blue-400" />
+                                      </CustomIconButton>
+                                      <CustomIconButton
+                                        onClick={() => {
+                                          setTaskOps((prev) => ({
+                                            ...prev,
+                                            viewIndex: -1,
+                                            deleteIndex: index,
+                                          }));
+                                        }}
+                                      >
+                                        <Trash
+                                          size={20}
+                                          className="w-5 h-5 text-red-400"
+                                        />
+                                      </CustomIconButton>
+                                    </motion.div>
+                                  ) : (
+                                    <motion.div>
+                                      <CustomIconButton
+                                        onClick={() => {
+                                          formik.handleSubmit();
+                                          setTaskOps((prev) => ({
+                                            ...prev,
+                                            updateIndex: -1,
+                                          }));
+                                        }}
+                                      >
+                                        <CheckCircle className="w-5 h-5 text-blue-400" />
+                                      </CustomIconButton>
+                                      <CustomIconButton
+                                        onClick={() => {
+                                          setTaskOps((prev) => ({
+                                            ...prev,
+                                            updateIndex: -1,
+                                            viewIndex: -1,
+                                          }));
+                                        }}
+                                      >
+                                        <XCircle
+                                          className="w-5 h-5 text-red-400"
+                                          size={20}
+                                        />
+                                      </CustomIconButton>
+                                    </motion.div>
+                                  )
+                                ) : null // Return null if viewIndex does not match
+                              }
+
+                              <motion.div
+                                animate={{
+                                  rotate:
+                                    taskOps?.viewIndex === index ? 180 : 0,
+                                }}
+                                transition={{ duration: 0.3 }}
+                              >
+                                <CustomIconButton
+                                  onClick={() =>
+                                    taskOps?.viewIndex === index
+                                      ? setTaskOps((prev) => ({
+                                          ...prev,
+                                          viewIndex: -1,
+                                          deleteIndex: -1,
+                                          updateIndex: -1,
+                                          addTaskFormOpen: false,
+                                        }))
+                                      : setTaskOps((prev) => ({
+                                          ...prev,
+                                          viewIndex: index,
+                                          updateIndex: -1,
+                                          deleteIndex: -1,
+                                          addTaskFormOpen: false,
+                                        }))
+                                  }
+                                >
+                                  <ChevronDown
+                                    className="w-5 h-5 text-blue-400"
+                                    size={20}
+                                  />
+                                </CustomIconButton>
+                              </motion.div>
+                            </div>
+                          </div>
+
+                          {taskOps?.viewIndex === index && (
+                            <motion.div
+                              initial={{ y: 20, opacity: 0 }}
+                              animate={{ y: 0, opacity: 1 }}
+                              exit={{ y: 20, opacity: 0 }}
+                              transition={{
+                                duration: 0.3,
+                                ease: "easeOut",
+                                delay: 0.1,
+                              }}
+                              className="w-full border-t border-gray-300 flex justify-between   py-2 my-2 "
+                            >
+                              {taskOps?.updateIndex === index ? (
+                                <motion.div
+                                  initial={{ opacity: 0, y: -10 }}
+                                  animate={{ opacity: 1, y: 0 }}
+                                  exit={{ opacity: 0, y: 10 }}
+                                  className="flex-grow"
+                                >
+                                  <div className="flex flex-row">
+                                    <CustomTextArea
+                                      name="description"
+                                      id="description"
+                                      value={formik.values.description}
+                                      onChange={formik.handleChange}
+                                      onBlur={formik.handleBlur}
+                                      className="w-full mr-2"
+                                      rows={3}
+                                    ></CustomTextArea>
+                                    <div className="flex flex-col">
+                                      <CustomInput
+                                        id="deadline"
+                                        name="deadline"
+                                        type="date"
+                                        value={
+                                          formik.values.deadline.split("T")[0]
+                                        }
+                                        onChange={formik.handleChange}
+                                        onBlur={formik.handleBlur}
+                                      ></CustomInput>
+                                      <div className="flex space-x-4">
+                                        <CustomDropdown
+                                          id="status"
+                                          name="status"
+                                          options={statusOptions}
+                                          value={formik.values.status}
+                                          onChange={formik.handleChange}
+                                        ></CustomDropdown>
+                                      </div>
+                                    </div>
+                                  </div>
+                                </motion.div>
+                              ) : (
+                                <motion.span
+                                  initial={{ opacity: 0, y: 10 }}
+                                  animate={{ opacity: 1, y: 0 }}
+                                  exit={{ opacity: 0, y: -10 }}
+                                  className="flex-grow text-gray-800 font-medium flex justify-between"
+                                >
+                                  <p className="text-gray-700 text-sm leading-relaxed">
+                                    <strong>description :-</strong>{" "}
+                                    {task.description}
+                                  </p>
+                                  <p className="text-gray-700 text-sm leading-relaxed bg-gray-200 rounded-md p-1">
+                                    {task.deadline.split("T")[0]}
+                                  </p>
+                                </motion.span>
+                              )}
+                            </motion.div>
+                          )}
+                        </form>
+                      ) : (
+                        <motion.div
+                          initial={{ opacity: 0, y: -10 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          exit={{ opacity: 0, y: 10 }}
+                          className="flex items-center justify-between w-full border-2 border-red-300 bg-red-50 rounded-sm p-2"
+                        >
+                          <span className="text-[#424242]">
+                            are you sure you want to delete this task ?
+                          </span>
+                          <div className="flex items-center">
+                            <CustomIconButton
+                              onClick={() => {
+                                handleDelete(task._id);
+                              }}
+                            >
+                              <CheckCircle
+                                size={20}
+                                className="text-green-400 hover:text-green-600 transition-colors m-1"
+                              />
+                            </CustomIconButton>
+
+                            <CustomIconButton
+                              onClick={() => {
+                                setTaskOps((prev) => ({
+                                  ...prev,
+                                  viewIndex: -1,
+                                  deleteIndex: -1,
+                                }));
+                              }}
+                            >
+                              <XCircle
+                                size={20}
+                                className="text-red-400 hover:text-red-600 transition-colors m-1"
+                              />
+                            </CustomIconButton>
+                          </div>
+                        </motion.div>
+                      )}
+                    </li>
+                  ))
+                ) : (
+                  <div className="text-center text-gray-500 text-lg">
+                    No Tasks here add new tasks
+                  </div>
+                )}
               </ul>
             </div>
           </section>
