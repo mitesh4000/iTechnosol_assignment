@@ -1,3 +1,4 @@
+import axios from "axios";
 import { LogOut } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -6,14 +7,32 @@ import CustomIconButton from "./customIconButton";
 export default function Navbar() {
   const navigate = useNavigate();
   const [glowPosition, setGlowPosition] = useState({ x: 0, y: 0 });
+  const [profile, setProfile] = useState({ userName: "", email: "" });
+
+  const fetchUserProfile = async () => {
+    try {
+      const response = await axios.get(
+        `${import.meta.env.VITE_BASE_URL}/api/auth/get-profile`,
+        {
+          headers: {
+            Authorization: localStorage.getItem("token") || "",
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      setProfile(response.data.data);
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
   const handleLogout = () => {
-    console.log("somthing");
     localStorage.removeItem("token");
     navigate("/login");
   };
 
   useEffect(() => {
+    fetchUserProfile();
     const handleMouseMove = (e: MouseEvent) => {
       setGlowPosition({ x: e.clientX, y: e.clientY });
     };
@@ -40,7 +59,7 @@ export default function Navbar() {
             height={40}
           />
           <span className="text-[#F5F5F5] font-bold text-xl">
-            Mitesh Maurya
+            {profile.userName}
           </span>
         </div>
         <div className="flex items-center space-x-4">

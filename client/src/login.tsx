@@ -34,7 +34,6 @@ export default function LoginPage() {
         );
         localStorage.setItem("token", response.data.data);
         navigate("/");
-        console.log(response.data);
       } catch (error: AxiosError | unknown) {
         if (axios.isAxiosError(error)) {
           const axiosError = error as AxiosError;

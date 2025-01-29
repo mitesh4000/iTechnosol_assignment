@@ -12,7 +12,6 @@ const authMiddleware = (req: Request, res: Response, next: NextFunction) => {
         .json({ message: "Authorization header is missing" });
     }
 
-    console.log(authHeader);
     const token = authHeader.split(" ")[1];
     if (!token) {
       return res.status(401).json({ message: "Token is missing" });
@@ -25,8 +24,6 @@ const authMiddleware = (req: Request, res: Response, next: NextFunction) => {
     if (!decoded) {
       return res.status(401).json({ message: "Unable to decode Token" });
     }
-    // @ts-ignore
-    console.log(decoded, decoded.id);
     // @ts-ignore
     req.userId = decoded.id;
 

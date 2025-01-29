@@ -4,7 +4,6 @@ const ProtectedRoute = () => {
   const token = localStorage.getItem("token");
 
   if (!token) {
-    console.log("token not found");
     return <Navigate to="/login" replace />;
   }
   return <Outlet />;

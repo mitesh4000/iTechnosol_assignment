@@ -2,7 +2,9 @@ import { Request, Response } from "express";
 import jwt from "jsonwebtoken";
 import { z } from "zod";
 import userModal, { IUserFatchResponse } from "../model/user.model";
+import { authRequest } from "../types/authRequest";
 import { comparePassword, hashPassword } from "../utils/auth";
+import { errorResponse, successResponse } from "../utils/responseFormatter";
 import { userValidation } from "../utils/validationSchemas";
 
 export const register = async (
@@ -83,5 +85,28 @@ export const login = async (req: Request, res: Response): Promise<Response> => {
     const errorMessage =
       error instanceof Error ? error.message : "An unexpected error occurred";
     return res.status(500).json({ error: errorMessage });
+  }
+};
+
+export const getProfile = async (req: authRequest, res: Response) => {
+  const userId = req.userId;
+  try {
+    if (!userId) {
+      return res
+        .status(401)
+        .json(errorResponse("Unauthorized", "User not found"));
+    }
+    const userProfile = await userModal.findOne(
+      { _id: userId },
+      { password: 0, createdAt: 0, updatedAt: 0, __v: 0 }
+    );
+    return res
+      .status(200)
+      .json(successResponse(userProfile, "Profile fetched"));
+  } catch (error) {
+    console.error(error);
+    return res
+      .status(500)
+      .json(errorResponse("Internal server error", error as string));
   }
 };

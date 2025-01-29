@@ -38,7 +38,6 @@ export default function TaskListing() {
       _id: "",
     },
     onSubmit: (values) => {
-      console.log(values);
       values.deadline = values.deadline.split("T")[0];
       handleSubmit(values);
     },
@@ -80,8 +79,6 @@ export default function TaskListing() {
         }
       );
       await fetchAndBindData();
-
-      console.log(response.data);
     } catch (error) {
       if (axios.isAxiosError(error)) {
         console.error("Axios Error:", error.response?.data || error.message);
@@ -103,7 +100,6 @@ export default function TaskListing() {
         }
       );
       setTasks(response.data);
-      console.log(response.data); // Axios automatically parses JSON
     } catch (error) {
       console.error("Error fetching data:", error);
     }
@@ -120,8 +116,6 @@ export default function TaskListing() {
           },
         }
       );
-
-      console.log(response.data); // Axios automatically parses JSON
     } catch (error) {
       console.error("Error fetching data:", error);
     }
@@ -199,7 +193,7 @@ export default function TaskListing() {
                 {tasks.length > 0 ? (
                   tasks?.map((task, index) => (
                     <li
-                      className="flex items-center flex-col p-2 hover:bg-lime-50 rounded transition-colors"
+                      className="flex items-center border border-lime-400 flex-col p-2 hover:bg-lime-50 rounded transition-colors"
                       key={index}
                     >
                       {taskOps?.deleteIndex !== index ? (
@@ -337,7 +331,7 @@ export default function TaskListing() {
                                   }
                                 >
                                   <ChevronDown
-                                    className="w-5 h-5 text-blue-400"
+                                    className="w-5 h-5 text-lime-400"
                                     size={20}
                                   />
                                 </CustomIconButton>

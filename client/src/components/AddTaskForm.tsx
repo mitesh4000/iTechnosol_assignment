@@ -29,7 +29,6 @@ const AddTaskForm = ({
       );
 
       onClose();
-      console.log(response.data); // Use response.data instead of response
     } catch (error) {
       if (axios.isAxiosError(error)) {
         // Handle specific axios error
@@ -48,7 +47,6 @@ const AddTaskForm = ({
       deadline: "",
     },
     onSubmit: (values) => {
-      console.log(values);
       handleSubmit(values);
     },
   });

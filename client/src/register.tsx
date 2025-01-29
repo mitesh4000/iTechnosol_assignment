@@ -46,7 +46,6 @@ export default function RegisterPage() {
           values
         );
         localStorage.setItem("token", response.data.token);
-        console.log(response.data);
       } catch (error: unknown) {
         if (axios.isAxiosError(error)) {
           const axiosError = error as AxiosError;
