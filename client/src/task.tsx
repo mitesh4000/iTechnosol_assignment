@@ -10,6 +10,7 @@ import {
 } from "lucide-react";
 import { motion } from "motion/react";
 import { useEffect, useState } from "react";
+import backgroundImage from "./assets/bg.jpg";
 import AddTaskForm from "./components/AddTaskForm";
 import CustomDropdown from "./components/customDropdown";
 import CustomIconButton from "./components/customIconButton";
@@ -129,7 +130,15 @@ export default function TaskListing() {
   }, []);
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#F5F5F5]">
+    <div
+      className="min-h-screen flex flex-col bg-[#F5F5F5]"
+      style={{
+        backgroundImage: `url(${backgroundImage})`,
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+        backgroundRepeat: "no-repeat",
+      }}
+    >
       {/* Header */}
       <Navbar />
       {/* Main Content */}
@@ -137,7 +146,7 @@ export default function TaskListing() {
         <div className="flex flex-col justify-center md:flex-row gap-6">
           {/* Task List */}
           <section className="md:w-3/4">
-            <div className="bg-white rounded-lg shadow-md p-4">
+            <div className="bg-lime-50 rounded-lg shadow-md p-4">
               <div className="flex items-center justify-between mb-4">
                 <h2 className="text-xl font-semibold text-[#424242] ">
                   Your Tasks

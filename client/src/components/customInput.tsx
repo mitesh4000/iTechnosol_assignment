@@ -7,6 +7,8 @@ interface CustomInputProps {
   onBlur?: (e: React.FocusEvent<HTMLInputElement>) => void;
   label?: string;
   className?: string;
+  placeholder?: string;
+  error?: string;
 }
 
 const CustomInput: React.FC<CustomInputProps> = ({
@@ -17,7 +19,9 @@ const CustomInput: React.FC<CustomInputProps> = ({
   onChange,
   onBlur,
   label,
+  placeholder,
   className = "",
+  error,
 }) => {
   return (
     <div className={`relative ${className}`}>
@@ -30,7 +34,20 @@ const CustomInput: React.FC<CustomInputProps> = ({
         </label>
       )}
       <input
-        className="relative w-full bg-gray-100   border-gray-300 rounded-md  pl-3 pr-10 py-2 text-left cursor-default focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+        className={`
+  relative w-full 
+  ${error ? "bg-red-50" : "bg-gray-100"} 
+  ${error ? "border-red-400" : "border-gray-300"} 
+  rounded-md 
+  pl-3 pr-10 py-2 
+  text-left cursor-default 
+  focus:outline-none 
+  focus:ring-1 
+  ${error ? "focus:ring-red-500" : "focus:ring-lime-500"}
+  ${error ? "focus:border-red-500" : "focus:border-lime-500"} 
+  sm:text-sm
+`}
+        placeholder={placeholder}
         id={id}
         name={name}
         type={type}
@@ -38,6 +55,7 @@ const CustomInput: React.FC<CustomInputProps> = ({
         onChange={onChange}
         onBlur={onBlur}
       ></input>
+      <p className=" text-red-500 text-xs ml-2">{error}</p>
     </div>
   );
 };
