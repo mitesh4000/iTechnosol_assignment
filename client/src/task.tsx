@@ -65,11 +65,10 @@ export default function TaskListing() {
 
   const handleSubmit = async (values: FormInput) => {
     try {
-      const token =
-        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3OTg2ZmI0ZjI5OGUwOTI1NmQwMmVhMyIsImlhdCI6MTczODA0MzM2NiwiZXhwIjoxNzM4MTI5NzY2fQ.12ePRR1osTQTsa4x4nIPq_leXryBw6pTI8_JSahAYCQ"; // Keep token secure, consider using environment variables
+      const token = localStorage.getItem("token")?.split(" ")[1];
 
       const response = await axios.put(
-        "http://localhost:3200/task/" + values._id,
+        `${import.meta.env.VITE_API_URL}/api/task/${values._id}`,
         values,
         {
           headers: {
@@ -79,13 +78,11 @@ export default function TaskListing() {
         }
       );
 
-      console.log(response.data); // Use response.data instead of response
+      console.log(response.data);
     } catch (error) {
       if (axios.isAxiosError(error)) {
-        // Handle specific axios error
         console.error("Axios Error:", error.response?.data || error.message);
       } else {
-        // Handle generic error
         console.error("Unexpected Error:", error);
       }
     }
@@ -93,13 +90,15 @@ export default function TaskListing() {
 
   const fetchAndBindData = async () => {
     try {
-      const token =
-        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3OTg2ZmI0ZjI5OGUwOTI1NmQwMmVhMyIsImlhdCI6MTczODA0MzM2NiwiZXhwIjoxNzM4MTI5NzY2fQ.12ePRR1osTQTsa4x4nIPq_leXryBw6pTI8_JSahAYCQ"; // Replace with your actual token
-      const response = await axios.get("http://localhost:3200/task", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const token = localStorage.getItem("token")?.split(" ")[1];
+      const response = await axios.get(
+        `${import.meta.env.VITE_BASE_URL}/api/task`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
       setTasks(response.data);
       console.log(response.data); // Axios automatically parses JSON
     } catch (error) {
@@ -109,15 +108,15 @@ export default function TaskListing() {
 
   const deleteRecord = async (id: string) => {
     try {
-      console.log("object");
-      const token =
-        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3OTg2ZmI0ZjI5OGUwOTI1NmQwMmVhMyIsImlhdCI6MTczODA0MzM2NiwiZXhwIjoxNzM4MTI5NzY2fQ.12ePRR1osTQTsa4x4nIPq_leXryBw6pTI8_JSahAYCQ";
-
-      const response = await axios.delete("http://localhost:3200/task/" + id, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const token = localStorage.getItem("token")?.split(" ")[1];
+      const response = await axios.delete(
+        `${import.meta.env.VITE_API_URL}/api/task/${id}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
 
       console.log(response.data); // Axios automatically parses JSON
     } catch (error) {
@@ -154,8 +153,20 @@ export default function TaskListing() {
                 <CustomIconButton
                   onClick={() =>
                     taskOps?.addTaskFormOpen
-                      ? setTaskOps({ ...taskOps, addTaskFormOpen: false })
-                      : setTaskOps({ ...taskOps, addTaskFormOpen: true })
+                      ? setTaskOps({
+                          ...taskOps,
+                          addTaskFormOpen: false,
+                          updateIndex: -1,
+                          viewIndex: -1,
+                          deleteIndex: -1,
+                        })
+                      : setTaskOps({
+                          ...taskOps,
+                          addTaskFormOpen: true,
+                          updateIndex: -1,
+                          viewIndex: -1,
+                          deleteIndex: -1,
+                        })
                   }
                 >
                   <motion.div
@@ -175,13 +186,13 @@ export default function TaskListing() {
               >
                 <AddTaskForm
                   isOpen={taskOps?.addTaskFormOpen}
-                  onClose={() =>
-                    setTaskOps({ ...taskOps, addTaskFormOpen: false })
-                  }
+                  onClose={() => {
+                    setTaskOps({ ...taskOps, addTaskFormOpen: false });
+                  }}
                 ></AddTaskForm>
               </motion.div>
               <ul className="space-y-2">
-                {tasks.map((task, index) => (
+                {tasks?.map((task, index) => (
                   <li
                     className="flex items-center flex-col p-2 hover:bg-lime-50 rounded transition-colors"
                     key={index}
@@ -295,37 +306,28 @@ export default function TaskListing() {
                               }}
                               transition={{ duration: 0.3 }}
                             >
-                              {taskOps?.viewIndex === index ? (
-                                <CustomIconButton
-                                  onClick={() =>
-                                    setTaskOps((prev) => ({
-                                      ...prev,
-                                      viewIndex: -1,
-                                      deleteIndex: -1,
-                                    }))
-                                  }
-                                >
-                                  <ChevronDown
-                                    className="w-5 h-5 text-blue-400"
-                                    size={20}
-                                  />
-                                </CustomIconButton>
-                              ) : (
-                                <CustomIconButton
-                                  onClick={() => {
-                                    setTaskOps((prev) => ({
-                                      ...prev,
-                                      viewIndex: index,
-                                      deleteIndex: -1,
-                                    }));
-                                  }}
-                                >
-                                  <ChevronDown
-                                    className="w-5 h-5 text-blue-400"
-                                    size={20}
-                                  />
-                                </CustomIconButton>
-                              )}
+                              <CustomIconButton
+                                onClick={() =>
+                                  taskOps?.viewIndex === index
+                                    ? setTaskOps((prev) => ({
+                                        ...prev,
+                                        viewIndex: -1,
+                                        deleteIndex: -1,
+                                        addTaskFormOpen: false,
+                                      }))
+                                    : setTaskOps((prev) => ({
+                                        ...prev,
+                                        viewIndex: index,
+                                        deleteIndex: -1,
+                                        addTaskFormOpen: false,
+                                      }))
+                                }
+                              >
+                                <ChevronDown
+                                  className="w-5 h-5 text-blue-400"
+                                  size={20}
+                                />
+                              </CustomIconButton>
                             </motion.div>
                           </div>
                         </div>

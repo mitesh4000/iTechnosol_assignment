@@ -5,6 +5,7 @@ import { Link } from "react-router-dom";
 import * as Yup from "yup";
 import AuthLayout from "./Layouts/authLayout";
 import CustomInput from "./components/customInput";
+import { ApiResponse } from "./interface/apiResponse";
 import { registerInput } from "./interface/login.interface";
 
 export default function RegisterPage() {
@@ -41,7 +42,7 @@ export default function RegisterPage() {
     onSubmit: async (values: registerInput) => {
       try {
         const response = await axios.post(
-          "http://localhost:3200/auth/register",
+          `${import.meta.env.VITE_BASE_URL}/api/auth/register`,
           values
         );
         localStorage.setItem("token", response.data.token);
@@ -49,8 +50,10 @@ export default function RegisterPage() {
       } catch (error: unknown) {
         if (axios.isAxiosError(error)) {
           const axiosError = error as AxiosError;
+          const apiResponseError = axiosError.response
+            ?.data as ApiResponse<null>;
           const errorMessage =
-            axiosError.response?.data?.error ||
+            apiResponseError?.error ||
             axiosError.message ||
             "An unexpected error occurred";
           displayError(errorMessage);

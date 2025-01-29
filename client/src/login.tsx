@@ -6,9 +6,10 @@ import { Link } from "react-router-dom";
 import { object, string } from "yup";
 import AuthLayout from "./Layouts/authLayout";
 import CustomInput from "./components/customInput";
+import { ApiResponse } from "./interface/apiResponse";
 import { loginInput } from "./interface/login.interface";
 export default function LoginPage() {
-  let navigate = useNavigate();
+  const navigate = useNavigate();
 
   const [error, setError] = useState<string | null>(null);
   const loginInputSchema = object({
@@ -24,20 +25,23 @@ export default function LoginPage() {
       email: "",
       password: "",
     },
+    //ok
     onSubmit: async (values: loginInput) => {
       try {
         const response = await axios.post(
-          "http://localhost:3200/auth/login",
+          `${import.meta.env.VITE_BASE_URL}/api/auth/login`,
           values
         );
-        localStorage.setItem("token", response.data.token);
+        localStorage.setItem("token", response.data.data);
         navigate("/");
         console.log(response.data);
       } catch (error: AxiosError | unknown) {
         if (axios.isAxiosError(error)) {
           const axiosError = error as AxiosError;
+          const apiResponseError = axiosError.response
+            ?.data as ApiResponse<null>;
           const errorMessage =
-            axiosError.response?.data?.error ||
+            apiResponseError?.error ||
             axiosError.message ||
             "An unexpected error occurred";
           displayError(errorMessage);

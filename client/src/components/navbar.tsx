@@ -1,9 +1,17 @@
 import { LogOut } from "lucide-react";
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import CustomIconButton from "./customIconButton";
 
 export default function Navbar() {
+  const navigate = useNavigate();
   const [glowPosition, setGlowPosition] = useState({ x: 0, y: 0 });
+
+  const handleLogout = () => {
+    console.log("somthing");
+    localStorage.removeItem("token");
+    navigate("/login");
+  };
 
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
@@ -37,7 +45,7 @@ export default function Navbar() {
         </div>
         <div className="flex items-center space-x-4">
           <div className="sm:flex items-center space-x-2 bg-lime-400 hover:bg-lime-500 rounded-full px-3 py-1">
-            <CustomIconButton>
+            <CustomIconButton onClick={() => handleLogout()}>
               <LogOut className="w-5 h-5 text-white" />
             </CustomIconButton>
             <span className="hidden sm:block text-[#F5F5F5]">Logout</span>

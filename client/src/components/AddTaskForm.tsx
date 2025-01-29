@@ -15,16 +15,20 @@ const AddTaskForm = ({
 }) => {
   const handleSubmit = async (values: FormInput) => {
     try {
-      const token =
-        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3OTg2ZmI0ZjI5OGUwOTI1NmQwMmVhMyIsImlhdCI6MTczODA0MzM2NiwiZXhwIjoxNzM4MTI5NzY2fQ.12ePRR1osTQTsa4x4nIPq_leXryBw6pTI8_JSahAYCQ"; // Keep token secure, consider using environment variables
+      const token = localStorage.getItem("token")?.split(" ")[1];
 
-      const response = await axios.post("http://localhost:3200/task", values, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-      });
+      const response = await axios.post(
+        `${import.meta.env.VITE_BASE_URL}/api/task`,
+        values,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
 
+      onClose();
       console.log(response.data); // Use response.data instead of response
     } catch (error) {
       if (axios.isAxiosError(error)) {
