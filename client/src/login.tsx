@@ -6,6 +6,7 @@ import { Link } from "react-router-dom";
 import { object, string } from "yup";
 import AuthLayout from "./Layouts/authLayout";
 import CustomInput from "./components/customInput";
+import { ErrorBanner } from "./components/errorBanner";
 import { ApiResponse } from "./interface/apiResponse";
 import { loginInput } from "./interface/login.interface";
 export default function LoginPage() {
@@ -65,11 +66,7 @@ export default function LoginPage() {
       title="Welcome back"
       subtitle="Log in to your account to continue your journey with us."
     >
-      {error ? (
-        <div className="bg-red-100 rounded p-2">
-          <p className="text-red-500 text-sm">{error}</p>
-        </div>
-      ) : null}
+      {error ? <ErrorBanner message={error} /> : null}
       <form onSubmit={formik.handleSubmit} className="space-y-4">
         <div className="space-y-2">
           <CustomInput

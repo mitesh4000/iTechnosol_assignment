@@ -8,7 +8,7 @@ interface CustomInputProps {
   label?: string;
   className?: string;
   placeholder?: string;
-  error?: string;
+  error?: string | null;
 }
 
 const CustomInput: React.FC<CustomInputProps> = ({

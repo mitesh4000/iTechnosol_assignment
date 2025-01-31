@@ -10,23 +10,42 @@ import {
 } from "lucide-react";
 import { motion } from "motion/react";
 import { useEffect, useState } from "react";
+import { date, object, string } from "yup";
 import backgroundImage from "./assets/bg.jpg";
 import AddTaskForm from "./components/AddTaskForm";
 import CustomDropdown from "./components/customDropdown";
 import CustomIconButton from "./components/customIconButton";
 import CustomInput from "./components/customInput";
 import CustomTextArea from "./components/customTextArea";
+import { ErrorBanner } from "./components/errorBanner";
 import Navbar from "./components/navbar";
 import StatusBadge from "./components/status";
-import { FormInput, Task } from "./interface/task.interface";
+import { Task } from "./interface/task.interface";
 
 export default function TaskListing() {
   interface TaskOps {
-    viewIndex?: number; // Renamed from indexOfTaskToViewDescription
-    deleteIndex?: number; // Renamed from indexOfTaskToDelete
+    viewIndex?: number;
+    deleteIndex?: number;
     updateIndex?: number;
     addTaskFormOpen?: boolean;
   }
+
+  const [error, setError] = useState<string | null>(null);
+
+  const updateValidationSchema = object({
+    title: string().required("Title is required"),
+    description: string().required("Description is required"),
+    deadline: date().required("Deadline is required"),
+    status: string().required("Status is required"),
+  });
+
+  const displayError = (err: string) => {
+    setError(err);
+    const timeoutId = setTimeout(() => {
+      setError(null);
+    }, 2000);
+    return () => clearTimeout(timeoutId);
+  };
 
   const statusOptions = ["pending", "in progress", "completed"];
   const formik = useFormik({
@@ -37,9 +56,38 @@ export default function TaskListing() {
       status: "",
       _id: "",
     },
-    onSubmit: (values) => {
+    validationSchema: updateValidationSchema,
+    onSubmit: async (values) => {
       values.deadline = values.deadline.split("T")[0];
-      handleSubmit(values);
+      try {
+        const token = localStorage.getItem("token")?.split(" ")[1];
+
+        const response = await axios.put(
+          `${import.meta.env.VITE_BASE_URL}/api/task/${values._id}`,
+          values,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "application/json",
+            },
+          }
+        );
+        if (response.status >= 300) {
+          displayError(response.data.error);
+        }
+        await fetchAndBindData();
+
+        setTaskOps((prev) => ({
+          ...prev,
+          updateIndex: -1,
+        }));
+      } catch (error) {
+        if (axios.isAxiosError(error)) {
+          console.error("Axios Error:", error.response?.data || error.message);
+        } else {
+          console.error("Unexpected Error:", error);
+        }
+      }
     },
   });
   const [tasks, setTasks] = useState<Task[]>([]);
@@ -61,30 +109,6 @@ export default function TaskListing() {
       await fetchAndBindData();
     } catch (error) {
       console.error("Error deleting record:", error);
-    }
-  };
-
-  const handleSubmit = async (values: FormInput) => {
-    try {
-      const token = localStorage.getItem("token")?.split(" ")[1];
-
-      const response = await axios.put(
-        `${import.meta.env.VITE_BASE_URL}/api/task/${values._id}`,
-        values,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-        }
-      );
-      await fetchAndBindData();
-    } catch (error) {
-      if (axios.isAxiosError(error)) {
-        console.error("Axios Error:", error.response?.data || error.message);
-      } else {
-        console.error("Unexpected Error:", error);
-      }
     }
   };
 
@@ -116,7 +140,10 @@ export default function TaskListing() {
           },
         }
       );
+
+      displayError(response.data.message);
     } catch (error) {
+      displayError(error as string);
       console.error("Error fetching data:", error);
     }
   };
@@ -135,12 +162,9 @@ export default function TaskListing() {
         backgroundRepeat: "no-repeat",
       }}
     >
-      {/* Header */}
       <Navbar />
-      {/* Main Content */}
       <main className="flex-grow container mx-auto p-4 md:p-6 lg:p-8">
         <div className="flex flex-col justify-center md:flex-row gap-6">
-          {/* Task List */}
           <section className="md:w-3/4">
             <div className="bg-lime-50 rounded-lg shadow-md p-4">
               <div className="flex items-center justify-between mb-4">
@@ -202,6 +226,7 @@ export default function TaskListing() {
                           className="flex items-center flex-col justify-between w-full"
                         >
                           <div className="flex items-center justify-between w-full">
+                            {error ? <ErrorBanner message={error} /> : null}
                             {taskOps?.updateIndex === index ? (
                               <motion.div
                                 initial={{ opacity: 0, y: -10 }}
@@ -217,6 +242,11 @@ export default function TaskListing() {
                                   onBlur={formik.handleBlur}
                                   type="text"
                                   className="w-full mr-3"
+                                  error={
+                                    formik.touched.title
+                                      ? formik.errors.title
+                                      : null
+                                  }
                                 ></CustomInput>
                               </motion.div>
                             ) : (
@@ -277,10 +307,6 @@ export default function TaskListing() {
                                       <CustomIconButton
                                         onClick={() => {
                                           formik.handleSubmit();
-                                          setTaskOps((prev) => ({
-                                            ...prev,
-                                            updateIndex: -1,
-                                          }));
                                         }}
                                       >
                                         <CheckCircle className="w-5 h-5 text-blue-400" />
@@ -378,6 +404,11 @@ export default function TaskListing() {
                                         }
                                         onChange={formik.handleChange}
                                         onBlur={formik.handleBlur}
+                                        error={
+                                          formik.touched.title
+                                            ? formik.errors.title
+                                            : null
+                                        }
                                       ></CustomInput>
                                       <div className="flex space-x-4">
                                         <CustomDropdown
